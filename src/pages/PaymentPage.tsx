@@ -75,7 +75,7 @@ export default function PaymentPage() {
     if (user && user.id) {
       fetchData();
     }
-  }, [user]);
+  }, [classroomID, getToken, navigate, toast, user]);
 
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface FileChangeEvent extends React.ChangeEvent<HTMLInputElement> {}

@@ -59,7 +59,7 @@ export default function DashboardPage() {
     if (isLoaded && isSignedIn) {
       createOrFetchUser();
     }
-  }, [isLoaded, isSignedIn]);
+  }, [getToken, isLoaded, isSignedIn, user]);
 
   useEffect(() => {
     async function fetchSessions() {
@@ -92,7 +92,7 @@ export default function DashboardPage() {
     if (isLoaded && isSignedIn) {
       fetchSessions();
     }
-  }, [isLoaded, isSignedIn]);
+  }, [getToken, isLoaded, isSignedIn, user]);
 
   if (!isLoaded) {
     return (
