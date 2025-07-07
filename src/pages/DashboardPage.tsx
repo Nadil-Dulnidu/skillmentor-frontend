@@ -65,7 +65,7 @@ export default function DashboardPage() {
     async function fetchSessions() {
       if (!user) return;
 
-      const token = await getToken();
+      const token = await getToken({ template: "test-01" });
       if (!token) return;
 
       try {
