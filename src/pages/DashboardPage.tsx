@@ -17,7 +17,7 @@ export default function DashboardPage() {
     async function createOrFetchUser() {
       if (!user) return;
 
-      const token = await getToken({ template: "skillmentor-auth-frontend" });
+      const token = await getToken({ template: "test-01" });
       if (!token) return;
 
       // Prepare a payload that matches with the  backend endpoint requirements

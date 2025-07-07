@@ -3,13 +3,7 @@ import { useNavigate, useSearchParams, useParams } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import {Card,CardContent,CardFooter,CardHeader,CardTitle,} from "@/components/ui/card";
 import { useToast } from "@/components/hooks/use-toast";
 import { MentorClass, Session, Student } from "@/lib/types";
 import { BACKEND_URL } from "@/config/env";
@@ -83,6 +77,7 @@ export default function PaymentPage() {
     }
   }, [user]);
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface FileChangeEvent extends React.ChangeEvent<HTMLInputElement> {}
 
   const handleFileChange = (e: FileChangeEvent): void => {
@@ -145,6 +140,7 @@ export default function PaymentPage() {
       setTimeout(() => {
         navigate("/dashboard");
       }, 2000);
+    //eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast({
         title: "Error",

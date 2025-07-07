@@ -25,7 +25,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  sessions: any[];
+  sessions: Session[];
   enrolledCourses: Course[];
 }
 
