@@ -5,8 +5,9 @@ import LoginPage from "@/pages/LoginPage";
 import DashboardPage from "@/pages/DashboardPage";
 import PaymentPage from "@/pages/PaymentPage";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
+import AdminDashBoard from "./pages/AdminDashBoard";
 
-function App() {
+const App = () => {
   return (
     <BrowserRouter>
       <Layout>
@@ -32,6 +33,19 @@ function App() {
               <>
                 <SignedIn>
                   <PaymentPage />
+                </SignedIn>
+                <SignedOut>
+                  <LoginPage />
+                </SignedOut>
+              </>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <>
+                <SignedIn>
+                  <AdminDashBoard />
                 </SignedIn>
                 <SignedOut>
                   <LoginPage />
