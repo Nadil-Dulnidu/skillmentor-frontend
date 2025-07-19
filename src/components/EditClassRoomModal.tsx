@@ -14,7 +14,7 @@ interface EditClassRoomModalProps {
   mentorClass: MentorClass | undefined;
 }
 
-function EditClassRoomDialog({ isOpen, onClose, mentorClass }: EditClassRoomModalProps) {
+function EditClassRoomModal({ isOpen, onClose, mentorClass }: EditClassRoomModalProps) {
   const [classTitle, setClassTitle] = useState<string>("");
   const { getToken } = useAuth();
 
@@ -85,4 +85,4 @@ function EditClassRoomDialog({ isOpen, onClose, mentorClass }: EditClassRoomModa
   );
 }
 
-export default EditClassRoomDialog;
+export default EditClassRoomModal;

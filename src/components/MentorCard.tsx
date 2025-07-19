@@ -39,16 +39,8 @@ export function MentorCard({ mentorClass }: { mentorClass: MentorClass }) {
                 </p>
               </div> */}
               <div className="flex items-center space-x-2">
-                <img
-                  src={mentorClass.mentor.mentor_image}
-                  alt={mentorClass.mentor.first_name}
-                  className="size-6 object-cover object-top rounded-full"
-                />
-                <span className="text-sm">
-                  {mentorClass.mentor.first_name +
-                    " " +
-                    mentorClass.mentor.last_name}
-                </span>
+                <img src={mentorClass.mentor.mentor_image} alt={mentorClass.mentor.first_name} className="size-6 object-cover object-top rounded-full" />
+                <span className="text-sm">{mentorClass.mentor.first_name + " " + mentorClass.mentor.last_name}</span>
               </div>
               <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <Building2 className="size-6" />
@@ -62,15 +54,9 @@ export function MentorCard({ mentorClass }: { mentorClass: MentorClass }) {
             <div className="w-36">
               <div className="size-20 bg-muted flex items-center justify-center">
                 {mentorClass.class_image ? (
-                  <img
-                    src={mentorClass.class_image}
-                    alt={mentorClass.title}
-                    className="w-full h-full object-cover rounded-full"
-                  />
+                  <img src={mentorClass.class_image} alt={mentorClass.title} className="w-full h-full object-cover rounded-full" />
                 ) : (
-                  <span className="text-2xl font-semibold">
-                    {mentorClass.mentor.first_name.charAt(0)}
-                  </span>
+                  <span className="text-2xl font-semibold">{mentorClass.mentor.first_name.charAt(0)}</span>
                 )}
               </div>
             </div>
@@ -78,19 +64,9 @@ export function MentorCard({ mentorClass }: { mentorClass: MentorClass }) {
 
           <div className="mb-4 flex-grow">
             <div>
-              <p
-                className={cn(
-                  "text-sm transition-all duration-300 ease-in-out",
-                  !isExpanded && bioTooLong ? "line-clamp-3" : ""
-                )}
-              >
-                {mentorClass.mentor.subject}
-              </p>
+              <p className={cn("text-sm transition-all duration-300 ease-in-out", !isExpanded && bioTooLong ? "line-clamp-3" : "")}>{mentorClass.mentor.subject}</p>
               {bioTooLong && (
-                <button
-                  onClick={() => setIsExpanded(!isExpanded)}
-                  className="text-primary text-sm font-medium mt-1 hover:underline"
-                >
+                <button onClick={() => setIsExpanded(!isExpanded)} className="text-primary text-sm font-medium mt-1 hover:underline">
                   {isExpanded ? "See less" : "See more"}
                 </button>
               )}
@@ -102,9 +78,7 @@ export function MentorCard({ mentorClass }: { mentorClass: MentorClass }) {
             <div className="bg-gradient-to-br from-blue-100 to-blue-200 p-3 rounded-md flex flex-col gap-4">
               <div className="flex items-center space-x-2">
                 <GraduationCap className="w-4 h-4" />
-                <span className="text-sm">
-                  {mentorClass.enrolled_student_count} Enrollments
-                </span>
+                <span className="text-sm">{mentorClass.enrolled_student_count} Enrollments</span>
               </div>
 
               {/* {mentor.isCertified && (
@@ -118,25 +92,15 @@ export function MentorCard({ mentorClass }: { mentorClass: MentorClass }) {
         </div>
 
         <div className="p-6 pt-0">
-          <Button
-            onClick={handleSchedule}
-            className="w-full bg-black text-white hover:bg-black/90"
-          >
+          <Button onClick={handleSchedule} className="w-full bg-black text-white hover:bg-black/90">
             Schedule a session
           </Button>
         </div>
       </Card>
 
-      <SignupDialog
-        isOpen={isSignupDialogOpen}
-        onClose={() => setIsSignupDialogOpen(false)}
-      />
+      <SignupDialog isOpen={isSignupDialogOpen} onClose={() => setIsSignupDialogOpen(false)} />
 
-      <SchedulingModal
-        isOpen={isSchedulingModalOpen}
-        onClose={() => setIsSchedulingModalOpen(false)}
-        mentorClass={mentorClass}
-      />
+      <SchedulingModal isOpen={isSchedulingModalOpen} onClose={() => setIsSchedulingModalOpen(false)} mentorClass={mentorClass} />
     </>
   );
 }
