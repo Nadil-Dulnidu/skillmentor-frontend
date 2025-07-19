@@ -28,7 +28,7 @@ export default function PaymentPage() {
 
   useEffect(() => {
     async function fetchData() {
-      const token = await getToken();
+      const token = await getToken({ template: "test-01" });
       const result = await fetch(
         `${BACKEND_URL}/academic/student/${user?.id}`,
         {
@@ -116,7 +116,7 @@ export default function PaymentPage() {
         topic: topic,
       };
 
-      const token = await getToken();
+      const token = await getToken({ template: "test-01" });
 
       const result = await fetch(`${BACKEND_URL}/academic/session`, {
         method: "POST",
