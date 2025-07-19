@@ -4,16 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {Card,CardContent,CardFooter,CardHeader,CardTitle,} from "@/components/ui/card";
-import { useToast } from "@/components/hooks/use-toast";
 import { MentorClass, Session, Student } from "@/lib/types";
 import { BACKEND_URL } from "@/config/env";
 import { useAuth, useUser } from "@clerk/clerk-react";
+import { toast } from "sonner";
 
 export default function PaymentPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { sessionId } = useParams();
-  const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -38,10 +37,8 @@ export default function PaymentPage() {
         }
       );
       if (!result.ok) {
-        toast({
-          title: "Error",
+        toast("Error",{
           description: "Failed to fetch student data. Please try again later.",
-          variant: "destructive",
         });
         navigate("/dashboard");
         return;
@@ -59,11 +56,9 @@ export default function PaymentPage() {
         }
       );
       if (!result2.ok) {
-        toast({
-          title: "Error",
+        toast("Error",{
           description:
             "Failed to fetch mentor class data. Please try again later.",
-          variant: "destructive",
         });
         navigate("/dashboard");
         return;
@@ -75,7 +70,7 @@ export default function PaymentPage() {
     if (user && user.id) {
       fetchData();
     }
-  }, [classroomID, getToken, navigate, toast, user]);
+  }, [classroomID, getToken, navigate, user]);
 
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface FileChangeEvent extends React.ChangeEvent<HTMLInputElement> {}
@@ -131,8 +126,7 @@ export default function PaymentPage() {
         throw new Error("Failed to create session");
       }
 
-      toast({
-        title: "Payment Confirmed",
+      toast("Payment Confirmed",{
         description:
           "Your bank slip has been uploaded and verified. Session scheduled successfully.",
       });
@@ -142,11 +136,9 @@ export default function PaymentPage() {
       }, 2000);
     //eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      toast({
-        title: "Error",
+      toast("Error",{
         description:
           "There was a problem scheduling your session. Please try again.",
-        variant: "destructive",
       });
       setIsUploading(false);
     }
