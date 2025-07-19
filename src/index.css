@@ -87,3 +87,10 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+.custom-button-color{
+  border-color: #f9c815;
+  color: black;
+}
+

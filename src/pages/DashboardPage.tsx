@@ -11,7 +11,15 @@ export default function DashboardPage() {
   const [courses, setCourses] = useState<FullSession[]>([]);
   const router = useNavigate();
   const { getToken } = useAuth();
-  const { user } = useUser();
+  const { user} = useUser();
+
+  useEffect(() => {
+    if (isLoaded && user?.publicMetadata.role !== 'ADMIN') {
+      router("/dashboard"); // Redirect to student dashboard view
+    }else{
+      router("/admin")
+    }
+  }, [isLoaded, router, user]);
 
   useEffect(() => {
     async function createOrFetchUser() {
