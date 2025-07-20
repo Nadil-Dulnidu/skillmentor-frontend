@@ -22,7 +22,9 @@ const AddClassRoomModal = ({ isOpen, onClose }: AddClassRoomModalProp) => {
         throw new Error("Error");
       }
       const newClassRoom: ClassRoom = {
+        class_room_id:classRoomData.class_room_id,
         title: classRoomData?.title,
+        enrolled_student_count:classRoomData.enrolled_student_count,
         class_image: classRoomData?.class_image,
       };
       const token = await getToken({ template: "test-01" });
@@ -64,8 +66,7 @@ const AddClassRoomModal = ({ isOpen, onClose }: AddClassRoomModalProp) => {
               value={classRoomData?.class_image || ""}
               onChange={(event) => {
                 setClassRoomData((prev) => ({
-                  ...prev,
-                  title: prev?.title || "",
+                  ...prev!,
                   class_image: event.target.value,
                 }));
               }}
@@ -80,8 +81,7 @@ const AddClassRoomModal = ({ isOpen, onClose }: AddClassRoomModalProp) => {
               value={classRoomData?.title || ""}
               onChange={(event) => {
                 setClassRoomData((prev) => ({
-                  ...prev,
-                  class_image: prev?.class_image || "",
+                  ...prev!,
                   title: event.target.value,
                 }));
               }}

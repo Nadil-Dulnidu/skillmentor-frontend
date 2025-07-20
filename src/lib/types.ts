@@ -72,15 +72,15 @@ export interface Session {
 }
 
 export interface ClassRoom {
-  readonly class_room_id?: number;
+  readonly class_room_id: number;
   title: string;
-  enrolled_student_count?: number;
+  enrolled_student_count: number;
   class_image: string;
 }
 
 export interface Mentor {
-  mentor_id: number;
-  clerk_mentor_id: string;
+  readonly mentor_id: number;
+  clerk_mentor_id?: string;
   first_name: string;
   last_name: string;
   address: string;
@@ -92,6 +92,7 @@ export interface Mentor {
   phone_number: string;
   qualification: string;
   mentor_image: string;
+  class_room_id?: number;
 }
 
 export enum SessionStatus {

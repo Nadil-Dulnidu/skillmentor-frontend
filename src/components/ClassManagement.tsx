@@ -4,7 +4,7 @@ import { SearchIcon, PlusIcon, EditIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import EditClassRoomModal from "./EditClassRoomModal";
 import { Button } from "./ui/button";
-import AddClassRoomModal from "./addClassRoomModal";
+import AddClassRoomModal from "./AddClassRoomModal";
 
 export function ClassManagement() {
   const [mentorClasses, setMentorClasses] = useState<MentorClass[]>([]);
@@ -42,7 +42,8 @@ export function ClassManagement() {
               placeholder="Search classes..."
               value={searchClasses}
               onChange={(event)=>{setSearchClasses(event.target.value)}}
-              className="pl-9 pr-4 py-2 bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 w-64"
+              className="pl-9 pr-4 py-2 bg-white border border-gray-300 rounded-md 
+              text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 w-64"
             />
             <SearchIcon className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
           </div>
