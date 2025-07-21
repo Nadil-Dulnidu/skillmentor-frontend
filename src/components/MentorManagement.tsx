@@ -5,9 +5,24 @@ import { useAuth } from "@clerk/clerk-react";
 import { BACKEND_URL } from "@/config/env";
 import { Button } from "./ui/button";
 import AddMentorModal from "./AddMentorModal";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./ui/alert-dialog";
+import EditMentorModal from "./EditMentorModal";
 export function MentorManagement() {
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [isAddMentorModalOpen, setisAddMentorModalOpen] = useState(false);
+  const [selectId, setSelectId] = useState(0);
+  const [selectMentor, setSelectMentor] = useState<Mentor | undefined>();
+  const [isEditMentorModalOpen, setIsEditMentorModalOpen] = useState(false);
   const { getToken } = useAuth();
 
   useEffect(() => {
@@ -30,7 +45,7 @@ export function MentorManagement() {
       }
     };
     getMentors();
-  }, [getToken]);
+  }, [getToken, isAddMentorModalOpen, isEditMentorModalOpen]);
 
   return (
     <div>
@@ -41,7 +56,8 @@ export function MentorManagement() {
             <input
               type="text"
               placeholder="Search mentors..."
-              className="pl-9 pr-4 py-2 bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-yellow-500 w-64"
+              className="pl-9 pr-4 py-2 bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1
+               focus:ring-yellow-500 w-64"
             />
             <SearchIcon className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
           </div>
@@ -57,11 +73,11 @@ export function MentorManagement() {
         </div>
       </div>
       <AddMentorModal
-          isOpen={isAddMentorModalOpen}
-          onClose={() => {
-            setisAddMentorModalOpen(false);
-          }}
-        />
+        isOpen={isAddMentorModalOpen}
+        onClose={() => {
+          setisAddMentorModalOpen(false);
+        }}
+      />
       {/* Mentors Table */}
       <div className="bg-white rounded-md overflow-hidden shadow">
         <table className="min-w-full divide-y divide-gray-200">
@@ -107,12 +123,44 @@ export function MentorManagement() {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button className="text-yellow-600 hover:text-yellow-800 mr-3">
+                  <button
+                    onClick={() => {
+                      setSelectMentor(mentor);
+                      setIsEditMentorModalOpen(true);
+                    }}
+                    className="text-yellow-600 hover:text-yellow-800 mr-3"
+                  >
                     <EditIcon className="h-4 w-4" />
                   </button>
-                  <button className="text-red-500 hover:text-red-700">
-                    <TrashIcon className="h-4 w-4" />
-                  </button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <button
+                        onClick={() => {
+                          setSelectId(mentor.mentor_id);
+                        }}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <TrashIcon className="h-4 w-4" /> 
+                      </button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>This action cannot be undone. 
+                          This will permanently delete mentor and remove data from our servers.</AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => {
+                            console.log("deleted" + selectId);
+                          }}
+                        >
+                          Continue
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </td>
               </tr>
             ))}
@@ -121,11 +169,13 @@ export function MentorManagement() {
       </div>
       <div className="mt-4 flex justify-between items-center text-sm text-gray-600">
         <div>Showing 1 to 5 of 5 entries</div>
-        <div className="flex space-x-1">
-          <button className="px-3 py-1 rounded border border-gray-300 bg-gray-50 hover:bg-gray-100">Previous</button>
-          <button className="px-3 py-1 rounded border border-gray-300 bg-yellow-500 text-white">1</button>
-          <button className="px-3 py-1 rounded border border-gray-300 bg-gray-50 hover:bg-gray-100">Next</button>
-        </div>
+        <EditMentorModal
+          isOpen={isEditMentorModalOpen}
+          mentor={selectMentor}
+          isClose={() => {
+            setIsEditMentorModalOpen(false);
+          }}
+        />
       </div>
     </div>
   );
