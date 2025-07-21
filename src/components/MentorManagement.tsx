@@ -17,12 +17,15 @@ import {
   AlertDialogTrigger,
 } from "./ui/alert-dialog";
 import EditMentorModal from "./EditMentorModal";
+import { toast } from "sonner";
 export function MentorManagement() {
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [isAddMentorModalOpen, setisAddMentorModalOpen] = useState(false);
   const [selectId, setSelectId] = useState(0);
+  const [isdeleted, setIsDeleted] = useState(false);
   const [selectMentor, setSelectMentor] = useState<Mentor | undefined>();
   const [isEditMentorModalOpen, setIsEditMentorModalOpen] = useState(false);
+  const [searchMentor, setSearchMentor] = useState("");
   const { getToken } = useAuth();
 
   useEffect(() => {
@@ -45,7 +48,32 @@ export function MentorManagement() {
       }
     };
     getMentors();
-  }, [getToken, isAddMentorModalOpen, isEditMentorModalOpen]);
+  }, [getToken, isAddMentorModalOpen, isEditMentorModalOpen, isdeleted]);
+
+  const deleteMentor = async (selectId: number) => {
+    try {
+      if (!selectId) {
+        throw new Error("Mentor id is missing");
+      }
+      const token = await getToken({ template: "test-01" });
+      const response = await fetch(`${BACKEND_URL}/academic/mentor/${selectId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        const errReponse = await response.json();
+        throw new Error(errReponse.message || "Error with deleting mentor");
+      }
+      setIsDeleted(true);
+      toast.success("Mentor deleted successfully");
+    } catch (err) {
+      console.error(err);
+      toast.error("There was a problem with deleting mentor. Please try again!");
+    }
+  };
 
   return (
     <div>
@@ -58,6 +86,10 @@ export function MentorManagement() {
               placeholder="Search mentors..."
               className="pl-9 pr-4 py-2 bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1
                focus:ring-yellow-500 w-64"
+              value={searchMentor}
+              onChange={(event) => {
+                setSearchMentor(event.target.value);
+              }}
             />
             <SearchIcon className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
           </div>
@@ -101,69 +133,76 @@ export function MentorManagement() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {mentors.map((mentor) => (
-              <tr key={mentor.mentor_id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium">
-                      <img className="object-cover h-8 w-8 rounded-full" src={mentor.mentor_image} alt={mentor.first_name} />
-                    </div>
-                    <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-800">
-                        {mentor.first_name} {mentor.last_name}
+            {mentors
+              .filter((mentor) => 
+                mentor.first_name.toLowerCase().includes(searchMentor.toLowerCase()) 
+              || mentor.last_name.toLowerCase().includes(searchMentor.toLowerCase()))
+              .map((mentor) => (
+                <tr key={mentor.mentor_id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium">
+                        <img className="object-cover h-8 w-8 rounded-full" src={mentor.mentor_image} alt={mentor.first_name} />
+                      </div>
+                      <div className="ml-4">
+                        <div className="text-sm font-medium text-gray-800">
+                          {mentor.first_name} {mentor.last_name}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{mentor.email}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{mentor.profession}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  <div className="flex items-center">
-                    <span className="ml-1">Rs. {mentor.session_fee}</span>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button
-                    onClick={() => {
-                      setSelectMentor(mentor);
-                      setIsEditMentorModalOpen(true);
-                    }}
-                    className="text-yellow-600 hover:text-yellow-800 mr-3"
-                  >
-                    <EditIcon className="h-4 w-4" />
-                  </button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <button
-                        onClick={() => {
-                          setSelectId(mentor.mentor_id);
-                        }}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <TrashIcon className="h-4 w-4" /> 
-                      </button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                        <AlertDialogDescription>This action cannot be undone. 
-                          This will permanently delete mentor and remove data from our servers.</AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{mentor.email}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{mentor.profession}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <div className="flex items-center">
+                      <span className="ml-1">Rs. {mentor.session_fee}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button
+                      onClick={() => {
+                        setSelectMentor(mentor);
+                        setIsEditMentorModalOpen(true);
+                      }}
+                      className="text-yellow-600 hover:text-yellow-800 mr-3"
+                    >
+                      <EditIcon className="h-4 w-4" />
+                    </button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <button
                           onClick={() => {
-                            console.log("deleted" + selectId);
+                            setSelectId(mentor.mentor_id);
+                            setIsDeleted(false);
                           }}
+                          className="text-red-500 hover:text-red-700"
                         >
-                          Continue
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </td>
-              </tr>
-            ))}
+                          <TrashIcon className="h-4 w-4" />
+                        </button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. 
+                            This will permanently delete mentor and remove data from our servers.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => {
+                              deleteMentor(selectId);
+                            }}
+                          >
+                            Continue
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>

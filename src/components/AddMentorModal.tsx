@@ -33,17 +33,17 @@ interface FormData {
 }
 
 const formSchema = z.object({
-  first_name: z.string().nonempty("First name must be empty"),
-  last_name: z.string().nonempty("Last name must be empty"),
-  address: z.string().nonempty("Address must be empty"),
-  email: z.email("Invalid Email").nonempty("Email must not be empty"),
-  title: z.string().nonempty("Title must not be empty"),
+  first_name: z.string().nonempty("First name is empty"),
+  last_name: z.string().nonempty("Last name is empty"),
+  address: z.string().nonempty("Address is empty"),
+  email: z.email("Invalid Email").nonempty("Email is empty"),
+  title: z.string().nonempty("Title is empty"),
   session_fee: z.preprocess((val) => Number(val), z.number().positive("Must be positive")),
-  profession: z.string().nonempty("Profession must be empty"),
-  subject: z.string().nonempty("Subject must be empty"),
-  phone_number: z.string().nonempty("Phone must be empty"),
-  qualification: z.string().nonempty("Qualification must be empty"),
-  mentor_image: z.string().nonempty("Image url must be empty"),
+  profession: z.string().nonempty("Profession is empty"),
+  subject: z.string().nonempty("Subject is empty"),
+  phone_number: z.string().nonempty("Phonenumber is empty"),
+  qualification: z.string().nonempty("Qualification is empty"),
+  mentor_image: z.string().nonempty("Image url is empty"),
   class_room_id: z.number().positive("must be postive value"),
 });
 

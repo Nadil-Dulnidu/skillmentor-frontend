@@ -33,17 +33,17 @@ interface FormData {
 }
 
 const formSchema = z.object({
-  first_name: z.string().nonempty("First name must be empty"),
-  last_name: z.string().nonempty("Last name must be empty"),
-  address: z.string().nonempty("Address must be empty"),
-  email: z.email("Invalid Email").nonempty("Email must not be empty"),
-  title: z.string().nonempty("Title must not be empty"),
+  first_name: z.string().nonempty("First name is empty"),
+  last_name: z.string().nonempty("Last name is empty"),
+  address: z.string().nonempty("Address is empty"),
+  email: z.email("Invalid Email").nonempty("Email is empty"),
+  title: z.string().nonempty("Title is empty"),
   session_fee: z.preprocess((val) => Number(val), z.number().positive("Must be positive")),
-  profession: z.string().nonempty("Profession must be empty"),
-  subject: z.string().nonempty("Subject must be empty"),
-  phone_number: z.string().nonempty("Phone must be empty"),
-  qualification: z.string().nonempty("Qualification must be empty"),
-  mentor_image: z.string().nonempty("Image url must be empty"),
+  profession: z.string().nonempty("Profession is empty"),
+  subject: z.string().nonempty("Subject is empty"),
+  phone_number: z.string().nonempty("Phonenumber is empty"),
+  qualification: z.string().nonempty("Qualification is empty"),
+  mentor_image: z.string().nonempty("Image url is empty"),
 });
 
 const EditMentorModal = ({ isOpen, isClose, mentor }: ModalProp) => {
@@ -108,6 +108,7 @@ const EditMentorModal = ({ isOpen, isClose, mentor }: ModalProp) => {
         phone_number: formMentor.phone_number,
         qualification: formMentor.qualification,
         mentor_image: formMentor.mentor_image,
+        class_room_id: mentor.class_room_id
       };
       console.log(updatedMentor)
       const token = await getToken({ template: "test-01" });
@@ -123,15 +124,15 @@ const EditMentorModal = ({ isOpen, isClose, mentor }: ModalProp) => {
         const errorResponse = await response.json();
         throw new Error(errorResponse.message || "Failed to update mentor");
       }
+      isClose();
       toast.success("Mentor updated successfully");
     } catch (err) {
       console.error(err);
-      toast.error("There was a problem with update mentor. Please try again!");
+      toast.error("There was a problem with updatading mentor. Please try again!");
     }
   };
 
   const onSubmit = (data: FormData): void => {
-    isClose();
     editMentor(data);
   };
 
