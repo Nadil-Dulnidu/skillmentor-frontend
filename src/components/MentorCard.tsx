@@ -50,7 +50,7 @@ export function MentorCard({ mentorClass }: { mentorClass: MentorClass }) {
                   onClick={() => {
                     handleMentorDetails(mentorClass);
                   }}
-                  className="text-sm"
+                  className="text-sm cursor-pointer"
                 >
                   {mentorClass.mentor.first_name + " " + mentorClass.mentor.last_name}
                 </span>
@@ -93,7 +93,6 @@ export function MentorCard({ mentorClass }: { mentorClass: MentorClass }) {
                 <GraduationCap className="w-4 h-4" />
                 <span className="text-sm">{mentorClass.enrolled_student_count} Enrollments</span>
               </div>
-
               {/* {mentor.isCertified && (
                 <div className="flex items-center space-x-2">
                   <ShieldCheck className="w-4 h-4" />

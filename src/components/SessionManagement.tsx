@@ -55,7 +55,7 @@ export function SessionManagement() {
         </div>
       </div>
       {/* Sessions Table */}
-      <div className="bg-white rounded-md overflow-x-auto shadow">
+      <div className="bg-white rounded-md overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent shadow">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>

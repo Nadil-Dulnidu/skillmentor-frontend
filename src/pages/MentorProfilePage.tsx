@@ -9,7 +9,7 @@ import { Link, useLocation, useParams } from "react-router";
 const MentorProfile = () => {
   const [isSchedulingModalOpen, setIsSchedulingModalOpen] = useState(false);
   const [isSignupDialogOpen, setIsSignupDialogOpen] = useState(false);
-  const { classroomId } = useParams();
+  const { mentorId } = useParams();
   const { isSignedIn } = useAuth();
   const location = useLocation();
   const mentorClass = location.state;
@@ -23,7 +23,7 @@ const MentorProfile = () => {
   };
 
   return (
-    <div data-id={classroomId}>
+    <div data-id={mentorId}>
       {/* Header */}
       <div className="text-black pb-3 pt-6">
         <div className="container mx-auto px-4">

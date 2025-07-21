@@ -125,16 +125,14 @@ const AddMentorModal = ({ isOpen, onClose }: AddMentorModalProp) => {
       onClose();
       toast.success("Mentor successfully added");
     } catch (err) {
+      console.error(err);
       toast.error("There was a problem with create mentor. Please try again!");
-      if (err instanceof Error) {
-        throw new Error(err.message);
-      }
     }
   };
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = async (data: FormData) => {
     setMentor((prev) => ({ ...prev!, ...data }));
-    createMentor();
+    await createMentor();
   };
 
   useEffect(() => {

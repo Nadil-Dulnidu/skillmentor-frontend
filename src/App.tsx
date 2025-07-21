@@ -55,7 +55,7 @@ const App = () => {
             }
           />
           <Route 
-            path="/mentor/:classroomId" 
+            path="/mentor/:mentorId" 
             element={<MentorProfile />} 
           />
           <Route path="*" element={<LoginPage />} />
