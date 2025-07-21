@@ -1,30 +1,60 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Input } from "./ui/input";
-import { Label } from "./ui/label";
 import { ClassRoom } from "@/lib/types";
 import { useAuth } from "@clerk/clerk-react";
 import { BACKEND_URL } from "@/config/env";
 import { toast } from "sonner";
-
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 interface AddClassRoomModalProp {
   isOpen: boolean;
   onClose(): void;
 }
+interface FormData {
+  title: string;
+  class_image: string;
+}
+
+const formSchema = z.object({
+  title: z.string().nonempty("Class title must not be empty"),
+  class_image: z.string().nonempty("Class image must not be empty"),
+});
 
 const AddClassRoomModal = ({ isOpen, onClose }: AddClassRoomModalProp) => {
   const [classRoomData, setClassRoomData] = useState<ClassRoom | null>(null);
   const { getToken } = useAuth();
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      class_image: "",
+    },
+  });
+
+  useEffect(() => {
+    if (isOpen && classRoomData) {
+      form.reset({
+        title: classRoomData.title || "",
+        class_image: classRoomData.class_image || "",
+      });
+    } else if (isOpen && !classRoomData) {
+      form.reset();
+    }
+  }, [classRoomData, form, isOpen]);
+
   const AddClassRoom = async () => {
     try {
       if (!classRoomData) {
         throw new Error("Error");
       }
       const newClassRoom: ClassRoom = {
-        class_room_id:classRoomData.class_room_id,
+        class_room_id: classRoomData.class_room_id,
         title: classRoomData?.title,
-        enrolled_student_count:classRoomData.enrolled_student_count,
+        enrolled_student_count: classRoomData.enrolled_student_count,
         class_image: classRoomData?.class_image,
       };
       const token = await getToken({ template: "test-01" });
@@ -37,17 +67,18 @@ const AddClassRoomModal = ({ isOpen, onClose }: AddClassRoomModalProp) => {
         body: JSON.stringify(newClassRoom),
       });
       if (!response.ok) {
-        throw new Error("Failed to update classroom");
+        const errResponse = await response.json();
+        throw new Error(errResponse.message || "Failed to update classroom");
       }
-      onClose();
-      toast.success("Successfully Added");
+      toast.success("Classroom added successfully");
     } catch (err) {
       console.log(err);
       toast.error("There was a problem with Adding classroom. Please try again!");
     }
   };
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
-    e.preventDefault();
+  const onSubmit = (data: FormData): void => {
+    setClassRoomData((prev) => ({ ...prev!, ...data }));
+    onClose();
     AddClassRoom();
   };
   return (
@@ -56,46 +87,46 @@ const AddClassRoomModal = ({ isOpen, onClose }: AddClassRoomModalProp) => {
         <DialogHeader>
           <DialogTitle>Create New Classroom</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
-            <Label htmlFor="title-1">Class Image</Label>
-            <Input
-              id="title-1"
-              placeholder="Image URL"
-              required
-              value={classRoomData?.class_image || ""}
-              onChange={(event) => {
-                setClassRoomData((prev) => ({
-                  ...prev!,
-                  class_image: event.target.value,
-                }));
-              }}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Classroom Title</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Classroom title" {...field} />
+                  </FormControl>
+                  <FormDescription />
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="grid gap-4 py-4">
-            <Label htmlFor="title-2">Title</Label>
-            <Input
-              id="title-2"
-              placeholder="Classroom Title"
-              required
-              value={classRoomData?.title || ""}
-              onChange={(event) => {
-                setClassRoomData((prev) => ({
-                  ...prev!,
-                  title: event.target.value,
-                }));
-              }}
+            <FormField
+              control={form.control}
+              name="class_image"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Classroom image URL</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Classroom image URL" {...field} />
+                  </FormControl>
+                  <FormDescription />
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline" type="button">
-                Cancel
-              </Button>
-            </DialogClose>
-            <Button type="submit">Add</Button>
-          </DialogFooter>
-        </form>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline" type="button">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button type="submit">Create</Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
