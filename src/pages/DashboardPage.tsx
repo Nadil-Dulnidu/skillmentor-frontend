@@ -15,7 +15,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (isLoaded && user?.publicMetadata.role !== 'ADMIN') {
-      router("/dashboard"); // Redirect to student dashboard view
+      router("/dashboard");
     }else{
       router("/admin")
     }

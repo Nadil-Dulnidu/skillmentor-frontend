@@ -99,6 +99,7 @@ export enum SessionStatus {
   PENDING = "PENDING",
   ACCEPTED = "ACCEPTED",
   COMPLETED = "COMPLETED",
+  CANCELLED = "CANCELLED"
 }
 
 export interface FullSession {

@@ -6,6 +6,7 @@ import DashboardPage from "@/pages/DashboardPage";
 import PaymentPage from "@/pages/PaymentPage";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
 import AdminDashBoard from "./pages/AdminDashBoard";
+import MentorProfile from "./pages/MentorProfilePage";
 
 const App = () => {
   return (
@@ -53,11 +54,15 @@ const App = () => {
               </>
             }
           />
+          <Route 
+            path="/mentor/:classroomId" 
+            element={<MentorProfile />} 
+          />
           <Route path="*" element={<LoginPage />} />
         </Routes>
       </Layout>
     </BrowserRouter>
   );
-}
+};
 
 export default App;

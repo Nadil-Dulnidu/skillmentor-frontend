@@ -45,10 +45,10 @@ function EditClassRoomModal({ isOpen, onClose, mentorClass }: EditClassRoomModal
   }, [classTitle, isOpen, form]);
 
   const editClassRoom = async (title: string) => {
-    if (!mentorClass) {
-      throw new Error("Mentor class data is missing.");
-    }
     try {
+      if (!mentorClass) {
+        throw new Error("Mentor class data is missing.");
+      }
       const updatedClassRoom: MentorClass = {
         class_room_id: mentorClass.class_room_id,
         title: title,

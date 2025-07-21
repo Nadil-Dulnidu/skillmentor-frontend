@@ -1,4 +1,4 @@
-import { Mentor } from "@/lib/types";
+import { Mentor, MentorClass } from "@/lib/types";
 import { useEffect, useState } from "react";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Input } from "./ui/input";
@@ -9,7 +9,6 @@ import { z } from "zod";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Textarea } from "./ui/textarea";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/select";
-import { ClassRoom } from "@/lib/types";
 import { BACKEND_URL } from "@/config/env";
 import { useAuth } from "@clerk/clerk-react";
 import { toast } from "sonner";
@@ -49,7 +48,7 @@ const formSchema = z.object({
 
 const AddMentorModal = ({ isOpen, onClose }: AddMentorModalProp) => {
   const [mentor, setMentor] = useState<Mentor | null>(null);
-  const [classes, setClasses] = useState<ClassRoom[]>([]);
+  const [classes, setClasses] = useState<MentorClass[]>([]);
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -288,7 +287,8 @@ const AddMentorModal = ({ isOpen, onClose }: AddMentorModalProp) => {
                   <FormItem>
                     <FormLabel>Session fee</FormLabel>
                     <FormControl>
-                      <Input className="md:w-80" placeholder="3000.00" {...field} value={field.value === undefined || field.value === null ? "" : String(field.value)} />
+                      <Input className="md:w-80" placeholder="3000.00" {...field} 
+                      value={field.value === undefined || field.value === null ? "" : String(field.value)} />
                     </FormControl>
                     <FormDescription />
                     <FormMessage />
@@ -326,7 +326,7 @@ const AddMentorModal = ({ isOpen, onClose }: AddMentorModalProp) => {
                       <SelectContent>
                         <SelectGroup>
                           <SelectLabel></SelectLabel>
-                          {classes.map((cls) => (
+                          {classes.filter((cls)=> !cls.mentor ).map((cls) => (
                             <SelectItem key={cls.class_room_id} value={cls.class_room_id.toString()}>
                               {cls.title}
                             </SelectItem>

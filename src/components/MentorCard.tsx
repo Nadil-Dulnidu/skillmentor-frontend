@@ -7,12 +7,14 @@ import { SchedulingModal } from "@/components/SchedulingModel";
 import { SignupDialog } from "@/components/SignUpDialog";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@clerk/clerk-react";
+import { useNavigate } from "react-router";
 
 export function MentorCard({ mentorClass }: { mentorClass: MentorClass }) {
   const [isSchedulingModalOpen, setIsSchedulingModalOpen] = useState(false);
   const [isSignupDialogOpen, setIsSignupDialogOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const { isSignedIn } = useAuth();
+  const navigate = useNavigate();
 
   // Use a simple threshold to decide if the bio is long enough
   const bioTooLong = mentorClass.mentor.subject.length > 200;
@@ -23,6 +25,10 @@ export function MentorCard({ mentorClass }: { mentorClass: MentorClass }) {
       return;
     }
     setIsSchedulingModalOpen(true);
+  };
+
+  const handleMentorDetails = (mentor: MentorClass) => {
+    navigate(`/mentor/${mentor.mentor.mentor_id}`, { state: mentor });
   };
 
   return (
@@ -40,7 +46,14 @@ export function MentorCard({ mentorClass }: { mentorClass: MentorClass }) {
               </div> */}
               <div className="flex items-center space-x-2">
                 <img src={mentorClass.mentor.mentor_image} alt={mentorClass.mentor.first_name} className="size-6 object-cover object-top rounded-full" />
-                <span className="text-sm">{mentorClass.mentor.first_name + " " + mentorClass.mentor.last_name}</span>
+                <span
+                  onClick={() => {
+                    handleMentorDetails(mentorClass);
+                  }}
+                  className="text-sm"
+                >
+                  {mentorClass.mentor.first_name + " " + mentorClass.mentor.last_name}
+                </span>
               </div>
               <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <Building2 className="size-6" />
