@@ -92,7 +92,7 @@ const AddMentorModal = ({ isOpen, onClose }: AddMentorModalProp) => {
   const createMentor = async () => {
     try {
       if (!mentor) {
-        throw new Error("Error");
+        throw new Error("Mentor data not Found");
       }
       const newMentor = {
         first_name: mentor.first_name.trim(),
@@ -125,8 +125,13 @@ const AddMentorModal = ({ isOpen, onClose }: AddMentorModalProp) => {
       onClose();
       toast.success("Mentor successfully added");
     } catch (err) {
-      console.error(err);
-      toast.error("There was a problem with create mentor. Please try again!");
+      if (err instanceof Error) {
+        console.error(err.message);
+        toast.error("There was a problem with create mentor. Please try again!");
+      } else {
+        console.error(err);
+        toast.error("An unknown error occurred.");
+      }
     }
   };
 
@@ -285,8 +290,7 @@ const AddMentorModal = ({ isOpen, onClose }: AddMentorModalProp) => {
                   <FormItem>
                     <FormLabel>Session fee</FormLabel>
                     <FormControl>
-                      <Input className="md:w-80" placeholder="3000.00" {...field} 
-                      value={field.value === undefined || field.value === null ? "" : String(field.value)} />
+                      <Input className="md:w-80" placeholder="3000.00" {...field} value={field.value === undefined || field.value === null ? "" : String(field.value)} />
                     </FormControl>
                     <FormDescription />
                     <FormMessage />
@@ -324,11 +328,13 @@ const AddMentorModal = ({ isOpen, onClose }: AddMentorModalProp) => {
                       <SelectContent>
                         <SelectGroup>
                           <SelectLabel></SelectLabel>
-                          {classes.filter((cls)=> !cls.mentor ).map((cls) => (
-                            <SelectItem key={cls.class_room_id} value={cls.class_room_id.toString()}>
-                              {cls.title}
-                            </SelectItem>
-                          ))}
+                          {classes
+                            .filter((cls) => !cls.mentor)
+                            .map((cls) => (
+                              <SelectItem key={cls.class_room_id} value={cls.class_room_id.toString()}>
+                                {cls.title}
+                              </SelectItem>
+                            ))}
                         </SelectGroup>
                       </SelectContent>
                     </Select>

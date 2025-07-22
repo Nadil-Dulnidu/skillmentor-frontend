@@ -18,6 +18,7 @@ import {
 } from "./ui/alert-dialog";
 import { useAuth } from "@clerk/clerk-react";
 import { toast } from "sonner";
+import { LoadingSpinner } from "./LoadingSpinner";
 export function ClassManagement() {
   const [mentorClasses, setMentorClasses] = useState<MentorClass[]>([]);
   const [isEditClassRoomModalOpen, setIsEditClassRoomModalOpen] = useState(false);
@@ -26,6 +27,7 @@ export function ClassManagement() {
   const [searchClasses, setSearchClasses] = useState("");
   const [selectId, setSelectId] = useState(0);
   const [isdeleted, setIsDeleted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { getToken } = useAuth();
 
   useEffect(() => {
@@ -41,6 +43,9 @@ export function ClassManagement() {
         setMentorClasses(data);
       } catch (error) {
         console.error("Error fetching mentor classes:", error);
+        toast.error("Something went wrong! Failed to fetch mentor classes");
+      } finally {
+        setIsLoading(false);
       }
     }
     fetchMentorClasses();
@@ -110,86 +115,92 @@ export function ClassManagement() {
         }}
       />
       {/* Classes Table */}
-      {mentorClasses.length ? (
-        <div className="bg-white rounded-md overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent shadow">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Title
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Mentor
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Enrolled students
-                </th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {mentorClasses
-                .filter((classroom) => classroom.title.toLowerCase().includes(searchClasses.toLowerCase()))
-                .map((cls) => (
-                  <tr key={cls.class_room_id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{cls.title}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600">
-                      {cls.mentor ? `${cls.mentor.first_name} ${cls.mentor.last_name}` : <p className="text-red-400">Not Assign</p>}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{cls.enrolled_student_count}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button
-                        onClick={() => {
-                          setIsEditClassRoomModalOpen(true);
-                          setMentorClass(cls);
-                        }}
-                        className="text-yellow-600 hover:text-yellow-800 mr-3"
-                      >
-                        <EditIcon className="h-4 w-4" />
-                      </button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <button
-                            onClick={() => {
-                              setSelectId(cls.class_room_id);
-                              setIsDeleted(false);
-                            }}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            <TrashIcon className="h-4 w-4" />
-                          </button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                            <AlertDialogDescription>This action cannot be undone. This will permanently delete classroom and remove data from servers.</AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
+      {!isLoading ? (
+        mentorClasses.length ? (
+          <div className="bg-white rounded-md overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent shadow">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Title
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Mentor
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Enrolled students
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {mentorClasses
+                  .filter((classroom) => classroom.title.toLowerCase().includes(searchClasses.toLowerCase()))
+                  .map((cls) => (
+                    <tr key={cls.class_room_id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{cls.title}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600">
+                        {cls.mentor ? `${cls.mentor.first_name} ${cls.mentor.last_name}` : <p className="text-red-400">Not Assign</p>}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{cls.enrolled_student_count}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button
+                          onClick={() => {
+                            setIsEditClassRoomModalOpen(true);
+                            setMentorClass(cls);
+                          }}
+                          className="text-yellow-600 hover:text-yellow-800 mr-3"
+                        >
+                          <EditIcon className="h-4 w-4" />
+                        </button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <button
                               onClick={() => {
-                                deleteClassroom(selectId);
+                                setSelectId(cls.class_room_id);
+                                setIsDeleted(false);
                               }}
+                              className="text-red-500 hover:text-red-700"
                             >
-                              Continue
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </div>
+                              <TrashIcon className="h-4 w-4" />
+                            </button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                              <AlertDialogDescription>This action cannot be undone. This will permanently delete classroom and remove data from servers.</AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => {
+                                  deleteClassroom(selectId);
+                                }}
+                              >
+                                Continue
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="text-center text-gray-500 text-sm">Empty classes</p>
+        )
       ) : (
-        <p className="text-center text-gray-500 text-sm">Empty classes</p>
+        <LoadingSpinner size="sm" text="Loading classes" />
       )}
-      <div className="mt-4 flex justify-between items-center text-sm text-gray-600">
-        <div>{`Total ${mentorClasses.length} Classrooms`}</div>
+      {!isLoading && mentorClasses.length ? (
+        <div className="mt-4 flex justify-between items-center text-sm text-gray-600">
+        <div>{`${mentorClasses.length} Classrooms`}</div>
       </div>
+      ) : ""}
       <div>
         <EditClassRoomModal
           isOpen={isEditClassRoomModalOpen}

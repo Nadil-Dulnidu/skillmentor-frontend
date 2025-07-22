@@ -18,6 +18,7 @@ import {
 } from "./ui/alert-dialog";
 import EditMentorModal from "./EditMentorModal";
 import { toast } from "sonner";
+import { LoadingSpinner } from "./LoadingSpinner";
 export function MentorManagement() {
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [isAddMentorModalOpen, setisAddMentorModalOpen] = useState(false);
@@ -26,6 +27,7 @@ export function MentorManagement() {
   const [selectMentor, setSelectMentor] = useState<Mentor | undefined>();
   const [isEditMentorModalOpen, setIsEditMentorModalOpen] = useState(false);
   const [searchMentor, setSearchMentor] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const { getToken } = useAuth();
 
   useEffect(() => {
@@ -45,6 +47,9 @@ export function MentorManagement() {
         setMentors(data);
       } catch (error) {
         console.error("Error fetching mentors:", error);
+        toast.error("Something went wrong! Failed to fetch mentors");
+      } finally {
+        setIsLoading(false);
       }
     };
     getMentors();
@@ -111,111 +116,118 @@ export function MentorManagement() {
         }}
       />
       {/* Mentors Table */}
-      <div className="bg-white rounded-md overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent shadow">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Name
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Email
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Profession
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Session Fee
-              </th>
-              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {mentors
-              .filter((mentor) => 
-                mentor.first_name.toLowerCase().includes(searchMentor.toLowerCase()) 
-              || mentor.last_name.toLowerCase().includes(searchMentor.toLowerCase()))
-              .map((mentor) => (
-                <tr key={mentor.mentor_id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium">
-                        <img className="object-cover h-8 w-8 rounded-full" src={mentor.mentor_image} alt={mentor.first_name} />
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-800">
-                          {mentor.first_name} {mentor.last_name}
+      {!isLoading ? (
+        mentors.length ? (
+          <div className="bg-white rounded-md overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent shadow">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Email
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Profession
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Session Fee
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {mentors
+                  .filter((mentor) => mentor.first_name.toLowerCase().includes(searchMentor.toLowerCase()) || mentor.last_name.toLowerCase().includes(searchMentor.toLowerCase()))
+                  .map((mentor) => (
+                    <tr key={mentor.mentor_id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium">
+                            <img className="object-cover h-8 w-8 rounded-full" src={mentor.mentor_image} alt={mentor.first_name} />
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-800">
+                              {mentor.first_name} {mentor.last_name}
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{mentor.email}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{mentor.profession}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    <div className="flex items-center">
-                      <span className="ml-1">Rs. {mentor.session_fee}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button
-                      onClick={() => {
-                        setSelectMentor(mentor);
-                        setIsEditMentorModalOpen(true);
-                      }}
-                      className="text-yellow-600 hover:text-yellow-800 mr-3"
-                    >
-                      <EditIcon className="h-4 w-4" />
-                    </button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{mentor.email}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{mentor.profession}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        <div className="flex items-center">
+                          <span className="ml-1">Rs. {mentor.session_fee}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button
                           onClick={() => {
-                            setSelectId(mentor.mentor_id);
-                            setIsDeleted(false);
+                            setSelectMentor(mentor);
+                            setIsEditMentorModalOpen(true);
                           }}
-                          className="text-red-500 hover:text-red-700"
+                          className="text-yellow-600 hover:text-yellow-800 mr-3"
                         >
-                          <TrashIcon className="h-4 w-4" />
+                          <EditIcon className="h-4 w-4" />
                         </button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This action cannot be undone. 
-                            This will permanently delete mentor and remove data from our servers.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => {
-                              deleteMentor(selectId);
-                            }}
-                          >
-                            Continue
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="mt-4 flex justify-between items-center text-sm text-gray-600">
-        <div>Showing 1 to 5 of 5 entries</div>
-        <EditMentorModal
-          isOpen={isEditMentorModalOpen}
-          mentor={selectMentor}
-          isClose={() => {
-            setIsEditMentorModalOpen(false);
-          }}
-        />
-      </div>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <button
+                              onClick={() => {
+                                setSelectId(mentor.mentor_id);
+                                setIsDeleted(false);
+                              }}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <TrashIcon className="h-4 w-4" />
+                            </button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                              <AlertDialogDescription>This action cannot be undone. This will permanently delete mentor and remove data from our servers.</AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => {
+                                  deleteMentor(selectId);
+                                }}
+                              >
+                                Continue
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="text-center text-gray-500 text-sm">Empty mentors</p>
+        )
+      ) : (
+        <LoadingSpinner size="sm" text="Loading mentors" />
+      )}
+      {!isLoading && mentors.length ? (
+        <div className="mt-4 flex justify-between items-center text-sm text-gray-600">
+          <div>{`${mentors.length} Mentors`}</div>
+        </div>
+      ) : (
+        ""
+      )}
+      <EditMentorModal
+        isOpen={isEditMentorModalOpen}
+        mentor={selectMentor}
+        isClose={() => {
+          setIsEditMentorModalOpen(false);
+        }}
+      />
     </div>
   );
 }

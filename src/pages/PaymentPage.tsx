@@ -37,9 +37,7 @@ export default function PaymentPage() {
         }
       );
       if (!result.ok) {
-        toast("Error",{
-          description: "Failed to fetch student data. Please try again later.",
-        });
+        toast.error("Failed to fetch student data. Please try again later.");
         navigate("/dashboard");
         return;
       }
@@ -56,10 +54,7 @@ export default function PaymentPage() {
         }
       );
       if (!result2.ok) {
-        toast("Error",{
-          description:
-            "Failed to fetch mentor class data. Please try again later.",
-        });
+        toast.error("Failed to fetch mentor class data. Please try again later.");
         navigate("/dashboard");
         return;
       }
@@ -136,10 +131,7 @@ export default function PaymentPage() {
       }, 2000);
     //eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      toast("Error",{
-        description:
-          "There was a problem scheduling your session. Please try again.",
-      });
+      toast.error("There was a problem scheduling your session. Please try again.");
       setIsUploading(false);
     }
   };

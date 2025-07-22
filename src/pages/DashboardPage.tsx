@@ -5,6 +5,7 @@ import { StatusPill } from "@/components/StatusPill";
 import { FullSession } from "@/lib/types";
 import { useNavigate } from "react-router";
 import { BACKEND_URL } from "@/config/env";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 export default function DashboardPage() {
   const { isLoaded, isSignedIn } = useAuth();
@@ -12,6 +13,7 @@ export default function DashboardPage() {
   const router = useNavigate();
   const { getToken } = useAuth();
   const { user} = useUser();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (isLoaded && user?.publicMetadata.role !== 'ADMIN') {
@@ -94,6 +96,8 @@ export default function DashboardPage() {
         setCourses(data);
       } catch (error) {
         console.error("Error fetching sessions:", error);
+      }finally{
+        setIsLoading(false);
       }
     }
 
@@ -115,7 +119,7 @@ export default function DashboardPage() {
     router("/login");
   }
 
-  if (!courses.length) {
+  if (!isLoading && !courses.length) {
     return (
       <div className="container py-10">
         <h1 className="text-3xl font-bold tracking-tight mb-6">My Courses</h1>
@@ -127,7 +131,8 @@ export default function DashboardPage() {
   return (
     <div className="container py-10">
       <h1 className="text-3xl font-bold tracking-tight mb-6">My Courses</h1>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+     {!isLoading ? (
+       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {courses.map((course) => (
           <div
             key={course.session_id}
@@ -170,6 +175,7 @@ export default function DashboardPage() {
           </div>
         ))}
       </div>
+     ) : <LoadingSpinner size="sm" text="Loading your courses"/>}
     </div>
   );
 }
