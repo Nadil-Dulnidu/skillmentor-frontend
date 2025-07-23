@@ -23,53 +23,53 @@ export default function DashboardPage() {
     }
   }, [isLoaded, router, user]);
 
-  useEffect(() => {
-    async function createOrFetchUser() {
-      if (!user) return;
+  // useEffect(() => {
+  //   async function createOrFetchUser() {
+  //     if (!user) return;
 
-      const token = await getToken({ template: "test-01" });
-      if (!token) return;
+  //     const token = await getToken({ template: "test-01" });
+  //     if (!token) return;
 
-      // Prepare a payload that matches with the  backend endpoint requirements
-      const userPayload = {
-        clerk_student_id: user.id,
-        first_name: user.firstName,
-        last_name: user.lastName,
-        email: user.primaryEmailAddress?.emailAddress,
-        phone_number: "-",
-        address: "-",
-        age: 20,
-      };
+  //     // Prepare a payload that matches with the  backend endpoint requirements
+  //     const userPayload = {
+  //       clerk_student_id: user.id,
+  //       first_name: user.firstName,
+  //       last_name: user.lastName,
+  //       email: user.primaryEmailAddress?.emailAddress,
+  //       phone_number: "-",
+  //       address: "-",
+  //       age: 20,
+  //     };
 
-      try {
-        // Perform API call to create/fetch user in backend
-        const createdUser = await fetch(`${BACKEND_URL}/academic/student`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(userPayload),
-        });
+  //     try {
+  //       // Perform API call to create/fetch user in backend
+  //       const createdUser = await fetch(`${BACKEND_URL}/academic/student`, {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //         body: JSON.stringify(userPayload),
+  //       });
 
-        if (!createdUser.ok) {
-          throw new Error("Failed to create/fetch user");
-        }
+  //       if (!createdUser.ok) {
+  //         throw new Error("Failed to create/fetch user");
+  //       }
 
-        // Logging the details to the console
-        const userData = await createdUser.json();
-        console.log("User ID:", user.id);
-        console.log("User Token:", token);
-        console.log("User created/fetched successfully:", userData);
-      } catch (error) {
-        console.error("Error creating/fetching user:", error);
-      }
-    }
+  //       // Logging the details to the console
+  //       const userData = await createdUser.json();
+  //       console.log("User ID:", user.id);
+  //       console.log("User Token:", token);
+  //       console.log("User created/fetched successfully:", userData);
+  //     } catch (error) {
+  //       console.error("Error creating/fetching user:", error);
+  //     }
+  //   }
 
-    if (isLoaded && isSignedIn) {
-      createOrFetchUser();
-    }
-  }, [getToken, isLoaded, isSignedIn, user]);
+  //   if (isLoaded && isSignedIn) {
+  //     createOrFetchUser();
+  //   }
+  // }, [getToken, isLoaded, isSignedIn, user]);
 
   useEffect(() => {
     async function fetchSessions() {
