@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Button } from "./ui/button";
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
-import { Input } from "./ui/input";
+import { Button } from "../ui/button";
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Input } from "../ui/input";
 import { ClassRoom } from "@/lib/types";
 import { useAuth } from "@clerk/clerk-react";
 import { BACKEND_URL } from "@/config/env";
@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 interface AddClassRoomModalProp {
   isOpen: boolean;
   onClose(): void;

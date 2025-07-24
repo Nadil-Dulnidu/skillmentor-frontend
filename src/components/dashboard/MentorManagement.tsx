@@ -3,7 +3,7 @@ import { SearchIcon, PlusIcon, EditIcon, TrashIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-react";
 import { BACKEND_URL } from "@/config/env";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import AddMentorModal from "./AddMentorModal";
 import {
   AlertDialog,
@@ -15,10 +15,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "./ui/alert-dialog";
+} from "../ui/alert-dialog";
 import EditMentorModal from "./EditMentorModal";
 import { toast } from "sonner";
-import { LoadingSpinner } from "./LoadingSpinner";
+import { LoadingSpinner } from "../LoadingSpinner";
 export function MentorManagement() {
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [isAddMentorModalOpen, setisAddMentorModalOpen] = useState(false);

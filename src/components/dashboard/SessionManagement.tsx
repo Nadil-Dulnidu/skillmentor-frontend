@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { StatusPill } from "@/components/StatusPill";
 import UpdateSessionModal from "./UpdateSessionModal";
 import { toast } from "sonner";
-import { LoadingSpinner } from "./LoadingSpinner";
+import { LoadingSpinner } from "../LoadingSpinner";
 
 export function SessionManagement() {
   const [sessions, setSessions] = useState<FullSession[]>([]);

@@ -3,7 +3,7 @@ import { MentorClass } from "@/lib/types";
 import { SearchIcon, PlusIcon, EditIcon, TrashIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import EditClassRoomModal from "./EditClassRoomModal";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import AddClassRoomModal from "./AddClassRoomModal";
 import {
   AlertDialog,
@@ -15,10 +15,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "./ui/alert-dialog";
+} from "../ui/alert-dialog";
 import { useAuth } from "@clerk/clerk-react";
 import { toast } from "sonner";
-import { LoadingSpinner } from "./LoadingSpinner";
+import { LoadingSpinner } from "../LoadingSpinner";
 export function ClassManagement() {
   const [mentorClasses, setMentorClasses] = useState<MentorClass[]>([]);
   const [isEditClassRoomModalOpen, setIsEditClassRoomModalOpen] = useState(false);

@@ -3,10 +3,10 @@ import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@clerk/clerk-react";
 import { useEffect, useState } from "react";
-import { BACKEND_URL } from "@/config/env";
 import { MentorClass } from "@/lib/types";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { toast } from "sonner";
+import api from "@/utils/axios";
 
 export default function HomePage() {
   const { isSignedIn } = useAuth();
@@ -16,15 +16,12 @@ export default function HomePage() {
   useEffect(() => {
     async function fetchMentorClasses() {
       try {
-        const response = await fetch(`${BACKEND_URL}/academic/classroom`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch mentor classes");
-        }
-        const data = await response.json();
-        setMentorClasses(data);
+        const response = await api.get("/classroom");
+        setMentorClasses(response.data);
       } catch (error) {
-        console.error("Error fetching mentor classes:", error);
         toast.error("Something went wrong. Error fetching mentor classes");
+        // @ts-expect-error: error.response is likely from axios
+        console.error(error.response);
       } finally {
         setIsLoading(false);
       }
@@ -77,5 +74,6 @@ export default function HomePage() {
         )}
       </div>
     </div>
+    
   );
 }
