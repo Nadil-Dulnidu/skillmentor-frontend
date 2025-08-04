@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { selectClassroomIds, useGetClassroomsQuery } from "./classroomSlice";
+import { selectAllClassrooms, useGetClassroomsQuery } from "./classroomSlice";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { JSX } from "react";
 import { MentorCard } from "./MentorCard";
@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 const ClassroomsList = () => {
   const { isLoading, isSuccess, isError, error } = useGetClassroomsQuery();
-  const classroomIds = useSelector(selectClassroomIds);
+  const classrooms = useSelector(selectAllClassrooms);
 
   const renderedClassrooms = () => {
     let content: JSX.Element | null = null;
@@ -16,8 +16,8 @@ const ClassroomsList = () => {
     } else if (isSuccess) {
       content = (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {classroomIds.map((mentorClassId) => (
-            <MentorCard key={mentorClassId} mentorClassId={mentorClassId} />
+          {classrooms.filter((cls) => cls.mentor).map((classroom) => (
+            <MentorCard key={classroom.class_room_id} mentorClassId={classroom.class_room_id} />
           ))}
         </div>
       );
