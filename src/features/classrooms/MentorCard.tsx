@@ -8,8 +8,12 @@ import { SignupDialog } from "@/components/SignUpDialog";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@clerk/clerk-react";
 import { useNavigate } from "react-router";
+import { selectClassroomById } from "@/features/classrooms/classroomSlice";
+import { useSelector } from "react-redux";
+import { RootState } from "@/app/store";
 
-export function MentorCard({ mentorClass }: { mentorClass: MentorClass }) {
+export function MentorCard({ mentorClassId }: { mentorClassId: number }) {
+  const mentorClass = useSelector((state: RootState) => selectClassroomById(state, mentorClassId));
   const [isSchedulingModalOpen, setIsSchedulingModalOpen] = useState(false);
   const [isSignupDialogOpen, setIsSignupDialogOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -111,7 +115,6 @@ export function MentorCard({ mentorClass }: { mentorClass: MentorClass }) {
       </Card>
 
       <SignupDialog isOpen={isSignupDialogOpen} onClose={() => setIsSignupDialogOpen(false)} />
-
       <SchedulingModal isOpen={isSchedulingModalOpen} onClose={() => setIsSchedulingModalOpen(false)} mentorClass={mentorClass} />
     </>
   );

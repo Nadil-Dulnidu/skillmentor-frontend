@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { BACKEND_URL } from "@/config/env";
 import { MentorClass } from "@/lib/types";
 import { useAuth } from "@clerk/clerk-react";
 import { useEffect, useState } from "react";
@@ -9,7 +8,8 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useUpdateClassroomMutation } from "@/features/classrooms/classroomSlice";
 interface EditClassRoomModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -23,6 +23,8 @@ const formSchema = z.object({
 function EditClassRoomModal({ isOpen, onClose, mentorClass }: EditClassRoomModalProps) {
   const [classTitle, setClassTitle] = useState("");
   const { getToken } = useAuth();
+  const [editClassroom] = useUpdateClassroomMutation();
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -57,17 +59,7 @@ function EditClassRoomModal({ isOpen, onClose, mentorClass }: EditClassRoomModal
         mentor: mentorClass.mentor,
       };
       const token = await getToken({ template: "test-01" });
-      const response = await fetch(`${BACKEND_URL}/academic/classroom`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(updatedClassRoom),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to update classroom");
-      }
+      await editClassroom({ updatedClassroom: updatedClassRoom, token }).unwrap();
       toast.success("Classroom updated successfully");
     } catch (err) {
       console.error(err);

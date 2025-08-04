@@ -72,9 +72,9 @@ export interface Session {
 }
 
 export interface ClassRoom {
-  readonly class_room_id: number;
+  readonly class_room_id?: number;
   title: string;
-  enrolled_student_count: number;
+  enrolled_student_count?: number;
   class_image: string;
 }
 

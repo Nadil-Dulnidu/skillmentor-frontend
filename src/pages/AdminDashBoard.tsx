@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { BookOpenIcon, UsersIcon, CalendarIcon } from "lucide-react";
-import { MentorManagement } from "@/components/dashboard/MentorManagement";
-import { SessionManagement } from "@/components/dashboard/SessionManagement";
-import { ClassManagement } from "@/components/dashboard/ClassManagement";
+import { MentorManagement } from "@/features/mentors/MentorManagementSection";
+import { SessionManagement } from "@/features/sessions/SessionManagement";
+import { ClassManagement } from "@/features/classrooms/ClassManagementSection";
 
 const AdminDashBoard = () => {
   const [activeTab, setActiveTab] = useState<string>(localStorage.getItem("activeTab") || "classes");

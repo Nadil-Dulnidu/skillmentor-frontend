@@ -6,11 +6,11 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
-import { Textarea } from "../ui/textarea";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../../components/ui/form";
+import { Textarea } from "../../components/ui/textarea";
 import { useAuth } from "@clerk/clerk-react";
-import { BACKEND_URL } from "@/config/env";
 import { toast } from "sonner";
+import { useUpdateMentorMutation } from "@/features/mentors/mentorSlice";
 
 type ModalProp = {
   isOpen: boolean;
@@ -49,6 +49,8 @@ const formSchema = z.object({
 const EditMentorModal = ({ isOpen, isClose, mentor }: ModalProp) => {
   const [mentorState, setMentorState] = useState<Mentor | null>(null);
   const { getToken } = useAuth();
+  const [updateMentor] = useUpdateMentorMutation();
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -110,20 +112,9 @@ const EditMentorModal = ({ isOpen, isClose, mentor }: ModalProp) => {
         mentor_image: formMentor.mentor_image,
         class_room_id: mentor.class_room_id
       };
-      console.log(updatedMentor)
+
       const token = await getToken({ template: "test-01" });
-      const response = await fetch(`${BACKEND_URL}/academic/mentor`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(updatedMentor),
-      });
-      if (!response.ok) {
-        const errorResponse = await response.json();
-        throw new Error(errorResponse.message || "Failed to update mentor");
-      }
+      await updateMentor({ updatedMentor: updatedMentor, token }).unwrap();
       isClose();
       toast.success("Mentor updated successfully");
     } catch (err) {

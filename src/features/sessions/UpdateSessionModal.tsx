@@ -2,14 +2,14 @@ import { FullSession } from "@/lib/types";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../../components/ui/form";
 import { useEffect, useState } from "react";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "../ui/button";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select";
+import { Button } from "../../components/ui/button";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { useAuth } from "@clerk/clerk-react";
-import { BACKEND_URL } from "@/config/env";
 import { toast } from "sonner";
+import { useUpdateSessionMutation } from "./sessionSlice";
 
 interface UpdateSessionProp {
   isOpen: boolean;
@@ -23,6 +23,7 @@ const formSchema = z.object({
 
 const UpdateSessionModal = ({ isOpen, onClose, fullSession }: UpdateSessionProp) => {
   const [sessionStatus, setSessionStatus] = useState("");
+  const [updateSession] = useUpdateSessionMutation();
   const { getToken } = useAuth();
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -45,23 +46,13 @@ const UpdateSessionModal = ({ isOpen, onClose, fullSession }: UpdateSessionProp)
     }
   }, [isOpen, form, sessionStatus]);
 
-  const updateSession = async (sessionStatus: string) => {
+  const updateSessionHandler = async (sessionStatus: string) => {
     try {
       if (!fullSession) {
         throw new Error("Session data is missing.");
       }
       const token = await getToken({ template: "test-01" });
-      const response = await fetch(`${BACKEND_URL}/academic/session/${fullSession.session_id}?sessionStatus=${sessionStatus}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        const errResponse = await response.json();
-        throw new Error(errResponse.message || "Failed to update session status");
-      }
+      await updateSession({ updatedSession: fullSession, sessionStatus, token });
       onClose();
       toast.success("Session status updated successfully");
     } catch (err) {
@@ -71,7 +62,7 @@ const UpdateSessionModal = ({ isOpen, onClose, fullSession }: UpdateSessionProp)
   };
 
   const onSubmit = (data: { session_status: string }) => {
-    updateSession(data.session_status);
+    updateSessionHandler(data.session_status);
   };
 
   return (

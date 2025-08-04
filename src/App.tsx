@@ -7,6 +7,11 @@ import PaymentPage from "@/pages/PaymentPage";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
 import AdminDashBoard from "./pages/AdminDashBoard";
 import MentorProfile from "./pages/MentorProfilePage";
+import { classroomApiSlice } from "./features/classrooms/classroomSlice";
+import { store } from "@/app/store";
+
+store.dispatch(classroomApiSlice.endpoints.getClassrooms.initiate());
+store.dispatch(classroomApiSlice.endpoints.getClassroomById.initiate(1));
 
 const App = () => {
   return (

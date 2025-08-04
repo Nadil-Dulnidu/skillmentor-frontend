@@ -1,68 +1,41 @@
-import { BACKEND_URL } from "@/config/env";
 import { FullSession } from "@/lib/types";
 import { useAuth } from "@clerk/clerk-react";
 import { SearchIcon, EditIcon, CalendarIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useMemo, useState } from "react";
 import { StatusPill } from "@/components/StatusPill";
 import UpdateSessionModal from "./UpdateSessionModal";
 import { toast } from "sonner";
-import { LoadingSpinner } from "../LoadingSpinner";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { useGetSessionsQuery, selectAllSessions } from "./sessionSlice";
+import { useSelector } from "react-redux";
 
 export function SessionManagement() {
-  const [sessions, setSessions] = useState<FullSession[]>([]);
   const { getToken } = useAuth();
   const [searchSession, setSearchSession] = useState("");
   const [isUpdateSessionModalOpen, setupdateSessionModalOpen] = useState(false);
   const [session, setSession] = useState<FullSession | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const getMentors = async () => {
-      try {
-        const token = await getToken({ template: "test-01" });
-        const response = await fetch(`${BACKEND_URL}/academic/session`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (!response.ok) {
-          const errorResponse = await response.json();
-          throw new Error(errorResponse.message || "Failed to fetch mentors");
-        }
-        const data = await response.json();
-        setSessions(data);
-      } catch (error) {
-        console.error("Error fetching sessions:", error);
-        toast.error("Something went wrong! Failed to fetch sessions");
-      } finally {
-        setIsLoading(false);
-      }
+    const fetchToken = async () => {
+      const t = await getToken({ template: "test-01" });
+      setToken(t);
     };
-    getMentors();
-  }, [getToken, isUpdateSessionModalOpen]);
-  return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold">Session Management</h2>
-        <div className="flex space-x-3">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search sessions..."
-              className="pl-9 pr-4 py-2 bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-yellow-500 w-64"
-              value={searchSession}
-              onChange={(event) => {
-                setSearchSession(event.target.value);
-              }}
-            />
-            <SearchIcon className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
-          </div>
-        </div>
-      </div>
-      {/* Sessions Table */}
-      {!isLoading ? (
-        sessions.length ? (
+    fetchToken();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const stableToken = useMemo(() => token, [token]);
+  const { isLoading, isSuccess, isError, error } = useGetSessionsQuery(stableToken, { skip: !stableToken });
+  const sessions = useSelector(selectAllSessions(stableToken));
+
+  const renderSessions = () => {
+    let content: JSX.Element | null = null;
+    if (isLoading) {
+      content = <LoadingSpinner size="sm" text="Loading mentors" />;
+    } else if (isSuccess) {
+      content = (
+        <>
           <div className="bg-white rounded-md overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent shadow">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -131,26 +104,57 @@ export function SessionManagement() {
               </tbody>
             </table>
           </div>
-        ) : (
-          <p className="text-center text-gray-500 text-sm">Empty sessions</p>
-        )
-      ) : (
-        <LoadingSpinner size="sm" text="Loading sessions" />
-      )}
-      {!isLoading && sessions.length ? (
-        <div className="mt-4 flex justify-between items-center text-sm text-gray-600">
-          <div>{`${sessions.length} Sessions`}</div>
+          <div className="mt-4 flex justify-between items-center text-sm text-gray-600">
+            <div>{`${sessions.length} Sessions`}</div>
+          </div>
+        </>
+      );
+    } else if (isError) {
+      toast.error("Something went wrong! Failed to fetch sessions");
+      let errorMessage = "An error occurred";
+      if (error && typeof error === "object") {
+        if ("status" in error) {
+          errorMessage = `Error: ${JSON.stringify(error.data) || error.status}`;
+        } else if ("message" in error) {
+          errorMessage = (error as { message?: string }).message || errorMessage;
+          console.error(errorMessage);
+        }
+      }
+      content = <p className="text-center text-gray-500 text-sm">Empty sessions</p>;
+    }
+    return content;
+  };
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-semibold">Session Management</h2>
+        <div className="flex space-x-3">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search sessions..."
+              className="pl-9 pr-4 py-2 bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-yellow-500 w-64"
+              value={searchSession}
+              onChange={(event) => {
+                setSearchSession(event.target.value);
+              }}
+            />
+            <SearchIcon className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+          </div>
         </div>
-      ) : (
-        ""
-      )}
-      <UpdateSessionModal
-        isOpen={isUpdateSessionModalOpen}
-        onClose={() => {
-          setupdateSessionModalOpen(false);
-        }}
-        fullSession={session}
-      />
+      </div>
+      {/* Sessions Table */}
+      {renderSessions()}
+      <div>
+        <UpdateSessionModal
+          isOpen={isUpdateSessionModalOpen}
+          onClose={() => {
+            setupdateSessionModalOpen(false);
+          }}
+          fullSession={session}
+        />
+      </div>
     </div>
   );
 }

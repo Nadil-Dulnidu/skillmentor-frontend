@@ -1,22 +1,19 @@
-import { useEffect, useState } from "react";
-import { Button } from "../ui/button";
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Input } from "../ui/input";
+import { useEffect } from "react";
+import { Button } from "../../components/ui/button";
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../../components/ui/dialog";
+import { Input } from "../../components/ui/input";
 import { ClassRoom } from "@/lib/types";
 import { useAuth } from "@clerk/clerk-react";
-import { BACKEND_URL } from "@/config/env";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../components/ui/form";
+import { useAddClassroomMutation } from "@/features/classrooms/classroomSlice";
+
 interface AddClassRoomModalProp {
   isOpen: boolean;
   onClose(): void;
-}
-interface FormData {
-  title: string;
-  class_image: string;
 }
 
 const formSchema = z.object({
@@ -24,10 +21,16 @@ const formSchema = z.object({
   class_image: z.string().nonempty("Class image must not be empty"),
 });
 
+type FormData = {
+  title: string;
+  class_image: string;
+}
+
 const AddClassRoomModal = ({ isOpen, onClose }: AddClassRoomModalProp) => {
-  const [classRoomData, setClassRoomData] = useState<ClassRoom | null>(null);
   const { getToken } = useAuth();
-  const form = useForm({
+  const [addClassroom] = useAddClassroomMutation();
+
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
@@ -36,51 +39,27 @@ const AddClassRoomModal = ({ isOpen, onClose }: AddClassRoomModalProp) => {
   });
 
   useEffect(() => {
-    if (isOpen && classRoomData) {
-      form.reset({
-        title: classRoomData.title || "",
-        class_image: classRoomData.class_image || "",
-      });
-    } else if (isOpen && !classRoomData) {
+    if (isOpen) {
       form.reset();
     }
-  }, [classRoomData, form, isOpen]);
+  }, [isOpen, form]);
 
-  const AddClassRoom = async () => {
+  const onSubmit = async (data: FormData) => {
     try {
-      if (!classRoomData) {
-        throw new Error("Error");
-      }
-      const newClassRoom: ClassRoom = {
-        class_room_id: classRoomData.class_room_id,
-        title: classRoomData?.title,
-        enrolled_student_count: classRoomData.enrolled_student_count,
-        class_image: classRoomData?.class_image,
-      };
       const token = await getToken({ template: "test-01" });
-      const response = await fetch(`${BACKEND_URL}/academic/classroom`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(newClassRoom),
-      });
-      if (!response.ok) {
-        const errResponse = await response.json();
-        throw new Error(errResponse.message || "Failed to update classroom");
-      }
+      const newClassRoom: ClassRoom = {
+        title: data.title,
+        class_image: data.class_image,
+      };
+      await addClassroom({ newClassroom: newClassRoom, token: token }).unwrap();
       toast.success("Classroom added successfully");
+      onClose();
     } catch (err) {
-      console.log(err);
-      toast.error("There was a problem with Adding classroom. Please try again!");
+      console.error("AddClassRoom error:", err);
+      toast.error("There was a problem with adding the classroom. Please try again!");
     }
   };
-  const onSubmit = (data: FormData): void => {
-    setClassRoomData((prev) => ({ ...prev!, ...data }));
-    onClose();
-    AddClassRoom();
-  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
@@ -98,7 +77,6 @@ const AddClassRoomModal = ({ isOpen, onClose }: AddClassRoomModalProp) => {
                   <FormControl>
                     <Input placeholder="Classroom title" {...field} />
                   </FormControl>
-                  <FormDescription />
                   <FormMessage />
                 </FormItem>
               )}
@@ -112,7 +90,6 @@ const AddClassRoomModal = ({ isOpen, onClose }: AddClassRoomModalProp) => {
                   <FormControl>
                     <Input placeholder="Classroom image URL" {...field} />
                   </FormControl>
-                  <FormDescription />
                   <FormMessage />
                 </FormItem>
               )}

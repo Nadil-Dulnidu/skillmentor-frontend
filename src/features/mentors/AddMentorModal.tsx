@@ -1,17 +1,20 @@
-import { Mentor, MentorClass } from "@/lib/types";
+import { MentorClass } from "@/lib/types";
 import { useEffect, useState } from "react";
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../../components/ui/dialog";
+import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
-import { Textarea } from "../ui/textarea";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select";
-import { BACKEND_URL } from "@/config/env";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../../components/ui/form";
+import { Textarea } from "../../components/ui/textarea";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { useAuth } from "@clerk/clerk-react";
 import { toast } from "sonner";
+import { useAddMentorMutation } from "@/features/mentors/mentorSlice";
+import { selectAllClassrooms } from "@/features/classrooms/classroomSlice";
+import { useSelector } from "react-redux";
+
 interface AddMentorModalProp {
   isOpen: boolean;
   onClose(): void;
@@ -37,18 +40,20 @@ const formSchema = z.object({
   address: z.string().nonempty("Address is empty"),
   email: z.email("Invalid Email").nonempty("Email is empty"),
   title: z.string().nonempty("Title is empty"),
-  session_fee: z.preprocess((val) => Number(val), z.number().positive("Must be positive")),
+  session_fee: z.preprocess((val) => Number(val), z.number().positive("Session fee must be positive")),
   profession: z.string().nonempty("Profession is empty"),
   subject: z.string().nonempty("Subject is empty"),
   phone_number: z.string().nonempty("Phonenumber is empty"),
   qualification: z.string().nonempty("Qualification is empty"),
   mentor_image: z.string().nonempty("Image url is empty"),
-  class_room_id: z.number().positive("must be postive value"),
+  class_room_id: z.number().positive("must be positive value"),
 });
 
 const AddMentorModal = ({ isOpen, onClose }: AddMentorModalProp) => {
-  const [mentor, setMentor] = useState<Mentor | null>(null);
   const [classes, setClasses] = useState<MentorClass[]>([]);
+  const [addMentor] = useAddMentorMutation();
+  const allClassrooms = useSelector(selectAllClassrooms);
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -69,27 +74,12 @@ const AddMentorModal = ({ isOpen, onClose }: AddMentorModalProp) => {
   const { getToken } = useAuth();
 
   useEffect(() => {
-    if (isOpen && mentor) {
-      form.reset({
-        first_name: mentor.first_name || "",
-        last_name: mentor.last_name || "",
-        address: mentor.address || "",
-        email: mentor.email || "",
-        title: mentor.title || "",
-        session_fee: mentor.session_fee || undefined,
-        profession: mentor.profession || "",
-        subject: mentor.subject || "",
-        phone_number: mentor.phone_number || "",
-        qualification: mentor.qualification || "",
-        mentor_image: mentor.mentor_image || "",
-        class_room_id: mentor.class_room_id || undefined,
-      });
-    } else if (isOpen && !mentor) {
+    if (isOpen) {
       form.reset();
     }
-  }, [form, isOpen, mentor]);
+  }, [isOpen, form]);
 
-  const createMentor = async () => {
+  const createMentor = async (mentor: FormData) => {
     try {
       if (!mentor) {
         throw new Error("Mentor data not Found");
@@ -110,18 +100,7 @@ const AddMentorModal = ({ isOpen, onClose }: AddMentorModalProp) => {
         class_room_id: mentor.class_room_id,
       };
       const token = await getToken({ template: "test-01" });
-      const response = await fetch(`${BACKEND_URL}/academic/mentor`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(newMentor),
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message);
-      }
+      await addMentor({ newMentor, token }).unwrap();
       onClose();
       toast.success("Mentor successfully added");
     } catch (err) {
@@ -136,25 +115,16 @@ const AddMentorModal = ({ isOpen, onClose }: AddMentorModalProp) => {
   };
 
   const onSubmit = async (data: FormData) => {
-    setMentor((prev) => ({ ...prev!, ...data }));
-    await createMentor();
+    await createMentor(data);
   };
 
   useEffect(() => {
-    const getClassrooms = async () => {
-      try {
-        const response = await fetch(`${BACKEND_URL}/academic/classroom`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch classes");
-        }
-        const data = await response.json();
-        setClasses(data);
-      } catch (error) {
-        console.error("Error fetching classes:", error);
-      }
+    const getClassrooms = () => {
+      const data = allClassrooms.filter((cls) => !cls.mentor);
+      setClasses(data);
     };
     getClassrooms();
-  }, [isOpen]);
+  }, [allClassrooms]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
