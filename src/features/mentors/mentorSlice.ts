@@ -52,7 +52,11 @@ export const mentorApiSlice = apiSlice.injectEndpoints({
           Authorization: `Bearer ${token}`
         }
       }),
-      invalidatesTags: [{ type: "Mentor", id: "LIST" }]
+      invalidatesTags: (_result, _error, arg) => [
+        { type: "Mentor", id: "LIST" },
+        { type: "Classroom", id: arg.newMentor.class_room_id },
+        { type: "Classroom", id: "LIST" }
+      ]
     }),
     updateMentor: builder.mutation<Mentor, { updatedMentor: Partial<Mentor>; token: string | null }>({
       query: ({ updatedMentor, token }) => ({
